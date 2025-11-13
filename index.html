@@ -1310,53 +1310,57 @@
                 }
             }
             
-            async startCPUMining() {
-                if (!this.currentUser) return;
-                
-                this.isMining = true;
-                this.miningType = 'cpu';
-                this.currentHashrate = 50000;
-                
-                await this.backend.startMining(this.currentUser.address, this.currentHashrate);
-                
-                document.getElementById('cpu-mining-btn').style.display = 'none';
-                document.getElementById('gpu-mining-btn').style.display = 'none';
-                document.getElementById('stop-mining-btn').style.display = 'block';
-                
-                this.cpuUsageInterval = setInterval(() => {
-    const usage = 70 + Math.random() * 20; // 70-90%
-    document.getElementById('cpu-usage').textContent = Math.round(usage) + '%';
-    document.getElementById('cpu-performance').style.width = usage + '%';
-    document.getElementById('cpu-performance-label').textContent = Math.round(usage) + '%';
-}, 1000);
-                
-                this.startMiningStats();
-                this.showNotification('Rozpoczęto kopanie CPU', 'success');
-            }
+async startCPUMining() {
+    if (!this.currentUser) return;
+    
+    this.isMining = true;
+    this.miningType = 'cpu';
+    this.currentHashrate = 50000;
+    
+    await this.backend.startMining(this.currentUser.address, this.currentHashrate);
+    
+    document.getElementById('cpu-mining-btn').style.display = 'none';
+    document.getElementById('gpu-mining-btn').style.display = 'none';
+    document.getElementById('stop-mining-btn').style.display = 'block';
+    
+    // UŻYCIE CPU - DODAJ TEŻ HASHRATE
+    this.cpuUsageInterval = setInterval(() => {
+        const usage = 70 + Math.random() * 20; // 70-90%
+        document.getElementById('cpu-usage').textContent = Math.round(usage) + '%';
+        document.getElementById('cpu-power').textContent = this.currentHashrate.toLocaleString() + ' H/s'; // DODAJ TE LINIJKĘ
+        document.getElementById('cpu-performance').style.width = usage + '%';
+        document.getElementById('cpu-performance-label').textContent = Math.round(usage) + '%';
+    }, 1000);
+    
+    this.startMiningStats();
+    this.showNotification('Rozpoczęto kopanie CPU', 'success');
+}
             
-            async startGPUMining() {
-                if (!this.currentUser) return;
-                
-                this.isMining = true;
-                this.miningType = 'gpu';
-                this.currentHashrate = 200000;
-                
-                await this.backend.startMining(this.currentUser.address, this.currentHashrate);
-                
-                document.getElementById('cpu-mining-btn').style.display = 'none';
-                document.getElementById('gpu-mining-btn').style.display = 'none';
-                document.getElementById('stop-mining-btn').style.display = 'block';
-            
-this.gpuUsageInterval = setInterval(() => {
-    const usage = 75 + Math.random() * 15; // 75-90%
-    document.getElementById('gpu-usage').textContent = Math.round(usage) + '%';
-    document.getElementById('gpu-performance').style.width = usage + '%';
-    document.getElementById('gpu-performance-label').textContent = Math.round(usage) + '%';
-}, 1000);
-                
-                this.startMiningStats();
-                this.showNotification('Rozpoczęto kopanie GPU', 'success');
-            }
+async startGPUMining() {
+    if (!this.currentUser) return;
+    
+    this.isMining = true;
+    this.miningType = 'gpu';
+    this.currentHashrate = 200000;
+    
+    await this.backend.startMining(this.currentUser.address, this.currentHashrate);
+    
+    document.getElementById('cpu-mining-btn').style.display = 'none';
+    document.getElementById('gpu-mining-btn').style.display = 'none';
+    document.getElementById('stop-mining-btn').style.display = 'block';
+    
+    // UŻYCIE GPU - DODAJ TEŻ HASHRATE
+    this.gpuUsageInterval = setInterval(() => {
+        const usage = 75 + Math.random() * 15; // 75-90%
+        document.getElementById('gpu-usage').textContent = Math.round(usage) + '%';
+        document.getElementById('gpu-power').textContent = this.currentHashrate.toLocaleString() + ' H/s'; // DODAJ TE LINIJKĘ
+        document.getElementById('gpu-performance').style.width = usage + '%';
+        document.getElementById('gpu-performance-label').textContent = Math.round(usage) + '%';
+    }, 1000);
+    
+    this.startMiningStats();
+    this.showNotification('Rozpoczęto kopanie GPU', 'success');
+}
             
       async stopMining() {
     this.isMining = false;
@@ -1396,10 +1400,11 @@ this.gpuUsageInterval = setInterval(() => {
                 }, 2000);
             }
             
- async updateMiningStats() {
+async updateMiningStats() {
     const stats = await this.backend.getMiningStats();
     
     if (stats.success) {
+        // AKTUALIZUJ HASHRATE W STATYSTYKACH
         document.getElementById('current-hash-rate').textContent = this.currentHashrate.toLocaleString() + ' H/s';
         document.getElementById('total-miners').textContent = stats.totalMiners;
         
@@ -1413,10 +1418,10 @@ this.gpuUsageInterval = setInterval(() => {
         if (!this.lastMineTime) this.lastMineTime = Date.now();
         const timeSinceLastMine = Date.now() - this.lastMineTime;
         
-        if (timeSinceLastMine > 10000) { // 10 sekund
+        if (timeSinceLastMine > 10000) {
             console.log("🔄 Kopanie bloku...");
             this.lastMineTime = Date.now();
-            await this.mineBlock();  // DODAJ await
+            await this.mineBlock();
         }
     }
 }
@@ -1556,6 +1561,7 @@ this.gpuUsageInterval = setInterval(() => {
 </body>
 
 </html>
+
 
 
 
