@@ -1358,36 +1358,37 @@ this.gpuUsageInterval = setInterval(() => {
                 this.showNotification('Rozpoczęto kopanie GPU', 'success');
             }
             
-            async stopMining() {
-                this.isMining = false;
-                
-                await this.backend.stopMining(this.currentUser.address);
-                
-                document.getElementById('cpu-mining-btn').style.display = 'block';
-                document.getElementById('gpu-mining-btn').style.display = 'block';
-                document.getElementById('stop-mining-btn').style.display = 'none';
-                
-                if (this.statsInterval) {
-                    clearInterval(this.statsInterval);
-                }
-                
-                this.showNotification('Kopanie zatrzymane', 'warning');
-            }
+      async stopMining() {
+    this.isMining = false;
+    
+    await this.backend.stopMining(this.currentUser.address);
+    
+    document.getElementById('cpu-mining-btn').style.display = 'block';
+    document.getElementById('gpu-mining-btn').style.display = 'block';
+    document.getElementById('stop-mining-btn').style.display = 'none';
+    
+    if (this.statsInterval) {
+        clearInterval(this.statsInterval);
+    }
+    
+    // PRZENIES TEN KOD DO ŚRODKA FUNKCJI:
+    if (this.cpuUsageInterval) {
+        clearInterval(this.cpuUsageInterval);
+    }
+    if (this.gpuUsageInterval) {
+        clearInterval(this.gpuUsageInterval);
+    }
 
-if (this.cpuUsageInterval) {
-    clearInterval(this.cpuUsageInterval);
-}
-if (this.gpuUsageInterval) {
-    clearInterval(this.gpuUsageInterval);
-}
-
-// Zresetuj wskaźniki użycia
-document.getElementById('cpu-usage').textContent = '0%';
-document.getElementById('cpu-performance').style.width = '0%';
-document.getElementById('cpu-performance-label').textContent = '0%';
-document.getElementById('gpu-usage').textContent = '0%';
-document.getElementById('gpu-performance').style.width = '0%';
-document.getElementById('gpu-performance-label').textContent = '0%';
+    // Zresetuj wskaźniki użycia
+    document.getElementById('cpu-usage').textContent = '0%';
+    document.getElementById('cpu-performance').style.width = '0%';
+    document.getElementById('cpu-performance-label').textContent = '0%';
+    document.getElementById('gpu-usage').textContent = '0%';
+    document.getElementById('gpu-performance').style.width = '0%';
+    document.getElementById('gpu-performance-label').textContent = '0%';
+    
+    this.showNotification('Kopanie zatrzymane', 'warning');
+}  // JEDNO } na końcu
             
             startMiningStats() {
                 this.statsInterval = setInterval(async () => {
@@ -1395,7 +1396,7 @@ document.getElementById('gpu-performance-label').textContent = '0%';
                 }, 2000);
             }
             
-            async updateMiningStats() {
+ async updateMiningStats() {
     const stats = await this.backend.getMiningStats();
     
     if (stats.success) {
@@ -1415,7 +1416,7 @@ document.getElementById('gpu-performance-label').textContent = '0%';
         if (timeSinceLastMine > 10000) { // 10 sekund
             console.log("🔄 Kopanie bloku...");
             this.lastMineTime = Date.now();
-            await this.mineBlock();
+            await this.mineBlock();  // DODAJ await
         }
     }
 }
@@ -1555,6 +1556,7 @@ document.getElementById('gpu-performance-label').textContent = '0%';
 </body>
 
 </html>
+
 
 
 
