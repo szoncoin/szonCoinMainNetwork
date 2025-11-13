@@ -1408,7 +1408,7 @@ document.getElementById('gpu-performance-label').textContent = '0%';
         if (timeSinceLastMine > 10000) { // 10 sekund
             console.log("🔄 Kopanie bloku...");
             this.lastMineTime = Date.now();
-            this.mineBlock();
+            await this.mineBlock();
         }
     }
 }
@@ -1548,6 +1548,7 @@ document.getElementById('gpu-performance-label').textContent = '0%';
 </body>
 
 </html>
+
 
 
 
