@@ -1360,23 +1360,29 @@
             }
             
             async updateMiningStats() {
-                const stats = await this.backend.getMiningStats();
-                
-                if (stats.success) {
-                    document.getElementById('current-hash-rate').textContent = this.currentHashrate.toLocaleString() + ' H/s';
-                    document.getElementById('total-miners').textContent = stats.totalMiners;
-                    
-                    const myChance = stats.minerChances[this.currentUser.address] || 0;
-                    document.getElementById('your-chance').textContent = myChance.toFixed(1) + '%';
-                    document.getElementById('chance-progress').style.width = myChance + '%';
-                    
-                    this.updateMinersList(stats.miners, stats.minerChances);
-                    
-                    if (Math.random() < 0.20) {
-                        this.mineBlock();
-                    }
-                }
-            }
+    const stats = await this.backend.getMiningStats();
+    
+    if (stats.success) {
+        document.getElementById('current-hash-rate').textContent = this.currentHashrate.toLocaleString() + ' H/s';
+        document.getElementById('total-miners').textContent = stats.totalMiners;
+        
+        const myChance = stats.minerChances[this.currentUser.address] || 0;
+        document.getElementById('your-chance').textContent = myChance.toFixed(1) + '%';
+        document.getElementById('chance-progress').style.width = myChance + '%';
+        
+        this.updateMinersList(stats.miners, stats.minerChances);
+        
+        // CO 10 SEKUND - GWARANTOWANE KOPANIE
+        if (!this.lastMineTime) this.lastMineTime = Date.now();
+        const timeSinceLastMine = Date.now() - this.lastMineTime;
+        
+        if (timeSinceLastMine > 10000) { // 10 sekund
+            console.log("🔄 Kopanie bloku...");
+            this.lastMineTime = Date.now();
+            this.mineBlock();
+        }
+    }
+}
             
             updateMinersList(miners, chances) {
                 const minersList = document.getElementById('miners-list');
@@ -1513,4 +1519,5 @@
 </body>
 
 </html>
+
 
