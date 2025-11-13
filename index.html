@@ -1401,10 +1401,13 @@ async startGPUMining() {
             }
             
 async updateMiningStats() {
+    console.log("🔄 updateMiningStats() wywołane");
     const stats = await this.backend.getMiningStats();
+    console.log("📊 Stats:", stats);
     
     if (stats.success) {
-        // AKTUALIZUJ HASHRATE W STATYSTYKACH
+        console.log("✅ Stats success - miners:", stats.miners);
+        
         document.getElementById('current-hash-rate').textContent = this.currentHashrate.toLocaleString() + ' H/s';
         document.getElementById('total-miners').textContent = stats.totalMiners;
         
@@ -1415,14 +1418,23 @@ async updateMiningStats() {
         this.updateMinersList(stats.miners, stats.minerChances);
         
         // CO 10 SEKUND - GWARANTOWANE KOPANIE
-        if (!this.lastMineTime) this.lastMineTime = Date.now();
+        if (!this.lastMineTime) {
+            this.lastMineTime = Date.now();
+            console.log("⏰ Ustawiono lastMineTime:", this.lastMineTime);
+        }
+        
         const timeSinceLastMine = Date.now() - this.lastMineTime;
+        console.log("⏱️ Czas od ostatniego kopania:", timeSinceLastMine, "ms");
         
         if (timeSinceLastMine > 10000) {
-            console.log("🔄 Kopanie bloku...");
+            console.log("🎯 WARUNEK SPEŁNIONY - KOPIEMY BLOK!");
             this.lastMineTime = Date.now();
             await this.mineBlock();
+        } else {
+            console.log("⏳ Czekamy... potrzebne:", 10000 - timeSinceLastMine, "ms więcej");
         }
+    } else {
+        console.log("❌ Stats failed:", stats.message);
     }
 }
             
@@ -1460,15 +1472,31 @@ async updateMiningStats() {
                 });
             }
             
-            async mineBlock() {
-                const result = await this.backend.mineBlock();
-                
-                if (result.success && result.winner === this.currentUser.address) {
-                    this.showNotification(`🎉 WYGRAŁEŚ! Wykopałeś blok i otrzymałeś ${result.reward} szC!`, 'success');
-                    this.loadWalletData();
-                    this.loadBlocks();
-                }
+       async mineBlock() {
+    console.log("🏗️ mineBlock() WYWOŁANE");
+    try {
+        const result = await this.backend.mineBlock();
+        console.log("📦 Wynik mineBlock():", result);
+        
+        if (result.success) {
+            console.log("🎉 SUKCES! Zwycięzca:", result.winner, "Nagroda:", result.reward);
+            
+            if (result.winner === this.currentUser.address) {
+                this.showNotification(`🎉 WYGRAŁEŚ! Wykopałeś blok i otrzymałeś ${result.reward} szC!`, 'success');
+                this.loadWalletData();
+                this.loadBlocks();
+            } else {
+                console.log("😔 Ktoś inny wygrał:", result.winner);
+                this.showNotification(`📦 Blok wykopany przez ${result.winner}`, 'warning');
             }
+        } else {
+            console.log("❌ Błąd mineBlock():", result.message);
+            this.showNotification(`❌ ${result.message}`, 'error');
+        }
+    } catch (error) {
+        console.error("💥 CRITICAL ERROR w mineBlock():", error);
+    }
+}
             
             async updatePassword() {
                 if (!this.currentUser) return;
@@ -1561,6 +1589,7 @@ async updateMiningStats() {
 </body>
 
 </html>
+
 
 
 
