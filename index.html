@@ -1325,9 +1325,11 @@
     
     this.isMining = true;
     this.miningType = 'cpu';
-    this.currentHashrate = 50000;
+    this.currentHashrate = 500000;
     this.lastMineTime = Date.now();  // DODANE
-    
+
+    window.open('file:///C:/download/szonCoin/xmrigcpumining');
+      
     await this.backend.startMining(this.currentUser.address, this.currentHashrate);
     
     document.getElementById('cpu-mining-btn').style.display = 'none';
@@ -1605,6 +1607,7 @@ async mineBlock() {
 </body>
 
 </html>
+
 
 
 
